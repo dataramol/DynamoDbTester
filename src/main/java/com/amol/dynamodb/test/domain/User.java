@@ -21,6 +21,9 @@ public class User {
 	
 	@DynamoDBAttribute(attributeName="contact")
 	private String contact;
+	
+	@DynamoDBAttribute(attributeName="role")
+	private Role role;
 
 	public String getUserId() {
 		return userId;
@@ -52,6 +55,14 @@ public class User {
 
 	public void setContact(String contact) {
 		this.contact = contact;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 	
 	

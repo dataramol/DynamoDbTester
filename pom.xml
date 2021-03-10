@@ -34,6 +34,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>dynamodb-enhanced</artifactId>
+            <version>2.16.5</version>
+        </dependency>
+         <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>dynamodb</artifactId>
+            <version>2.16.5</version>
+        </dependency>
+		<dependency>
          <groupId>com.amazonaws</groupId>
          <artifactId>aws-java-sdk-bom</artifactId>
          <version>1.11.614</version>

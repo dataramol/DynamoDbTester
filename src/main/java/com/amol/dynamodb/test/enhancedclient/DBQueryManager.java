@@ -20,14 +20,7 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Expression;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.enhanced.dynamodb.model.BatchWriteItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.ConditionCheck;
-import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.Page;
-import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
-import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.WriteBatch;
+import software.amazon.awssdk.enhanced.dynamodb.model.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -114,12 +107,34 @@ public class DBQueryManager {
 		
 		public static void txMixOperations()
 		{
-			
-		}
-		
-		public static void txMixOperationsConditionCheckFailure()
-		{
-			
+
+			LocalDate localDate = LocalDate.parse("2021-03-10");
+			LocalDateTime localDateTime = localDate.atStartOfDay();
+			Instant instant  = localDateTime.toInstant(ZoneOffset.UTC);
+
+			Order order4 = new Order();
+			order4.setOrderDate(instant);
+			order4.setOrderId("3");
+			order4.setOrderNumber("100");
+			order4.setOrderPaymentTotal("1000");
+
+			Order order5 = new Order();
+			order5.setOrderDate(instant);
+			order5.setOrderId("4");
+			order5.setOrderNumber("101");
+			order5.setOrderPaymentTotal("1000");
+
+			Order order3 = orderTable.getItem(Key.builder().partitionValue("1").sortValue(LocalDate.parse("2021-03-08").atStartOfDay().toInstant(ZoneOffset.UTC).toString());
+			order3.setOrderNumber("200");
+
+			Expression conditionExpression = Expression.builder().expression("#attribute = :attribute").expressionValues(singletonMap(":attribute", stringValue("100"))).expressionNames(singletonMap("#attribute", "orderNumber")).build();
+
+			Key key = Key.builder().partitionValue("3").build();
+
+			TransactWriteItemsEnhancedRequest transactWriteItemsEnhancedRequest =  TransactWriteItemsEnhancedRequest.builder().
+					addConditionCheck(orderTable,ConditionCheck.builder().conditionExpression(conditionExpression).build())
+					.addPutItem(orderTable,order4).addPutItem(orderTable,order5).addUpdateItem(orderTable,order3).build();
+			enhancedClient.transactWriteItems(transactWriteItemsEnhancedRequest);
 		}
 		
 		public static void queryIndex()
@@ -137,13 +152,13 @@ public class DBQueryManager {
 		
 		public static void scanTable()
 		{
-			custTable.scan().items().iterator().forEachRemaining(c -> System.out.println(c));
+			custTable.scan().items().iterator().forEachRemaining(System.out::println);
 		}
 		
 		public static void queryTable()
 		{
 			QueryConditional queryConditional = QueryConditional.keyEqualTo(Key.builder().partitionValue("1").build());
-			custTable.query(queryConditional).items().iterator().forEachRemaining(c -> System.out.println(c));
+			custTable.query(queryConditional).items().iterator().forEachRemaining(System.out::println);
 		}
 		
 		public static void putItem()
@@ -179,7 +194,7 @@ public class DBQueryManager {
 		public static void putBatchRecords()
 		{
 			//custTable.createTable();
-			orderTable.createTable();
+			//orderTable.createTable();
 			LocalDate localDate = LocalDate.parse("2021-03-08");
 			LocalDateTime localDateTime = localDate.atStartOfDay();
 			Instant instant  = localDateTime.toInstant(ZoneOffset.UTC);
